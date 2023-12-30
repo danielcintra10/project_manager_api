@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Project apps
+    'accounts.apps.AccountsConfig',
     # Third party packages
     'rest_framework',
 ]

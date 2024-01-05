@@ -2,7 +2,7 @@ from django.test import TestCase
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from accounts.models import User
-from api.serializers import UserSerializer
+from api.serializers import UserSerializer, MyTokenObtainPairSerializer
 
 
 class TestUserSerializer(TestCase):
@@ -226,3 +226,68 @@ class TestUserSerializer(TestCase):
         serializer = UserSerializer(data=serialized_data)
         self.assertFalse(serializer.is_valid())
 
+
+class TestMyTokenObtainPairSerializer(TestCase):
+    """Test MyTokenObtainPairSerializer to check if works properly"""
+
+    def setUp(self):
+        self.test_user = User.objects.create_user(email='robert@gmail.com',
+                                                  first_name='Robert',
+                                                  last_name='Lopez',
+                                                  role='D',
+                                                  mobile_phone='+53 59876543',
+                                                  password='Pass*2024*')
+
+    def test_validate_method_returns_expected_data_representation(self):
+        serializer = MyTokenObtainPairSerializer()
+        attrs = {'email': 'robert@gmail.com', 'password': 'Pass*2024*'}
+
+        result = serializer.validate(attrs)
+
+        assert 'user' in result
+        assert 'access_token' in result
+        assert 'refresh_token' in result
+        assert 'token_type' in result
+        assert result['token_type'] == 'Bearer'
+
+    def test_invalid_credentials_raise_authenticationfailed_error(self):
+        serializer = MyTokenObtainPairSerializer()
+        attrs = {'email': 'invaliduser', 'password': 'invalidpassword'}
+
+        with self.assertRaises(AuthenticationFailed):
+            serializer.validate(attrs)
+
+    def test_missing_credentials_raise_key_error(self):
+        serializer = MyTokenObtainPairSerializer()
+        attrs = {}
+
+        with self.assertRaises(KeyError):
+            serializer.validate(attrs)
+
+    def test_user_object_correctly_serialized_in_data_representation(self):
+        serializer = MyTokenObtainPairSerializer()
+        attrs = {'email': 'robert@gmail.com', 'password': 'Pass*2024*'}
+
+        result = serializer.validate(attrs)
+
+        assert 'user' in result
+        assert 'id' in result['user']
+        assert 'first_name' in result['user']
+        assert 'last_name' in result['user']
+        assert 'email' in result['user']
+        assert 'mobile_phone' in result['user']
+        assert 'role' in result['user']
+        assert 'is_admin_user' in result['user']
+
+    def test_correct_data_in_serializer_data(self):
+        serializer = MyTokenObtainPairSerializer()
+        attrs = {'email': 'robert@gmail.com', 'password': 'Pass*2024*'}
+
+        data = serializer.validate(attrs)
+        self.assertEqual(data.get("user").get("first_name"), "Robert")
+        self.assertEqual(data.get("user").get("last_name"), "Lopez")
+        self.assertEqual(data.get("user").get("email"), "robert@gmail.com")
+        self.assertEqual(data.get("user").get("role"), "Developer")
+        self.assertEqual(data.get("user").get("mobile_phone"), "+53 59876543")
+        self.assertEqual(data.get("user").get("is_admin_user"), False)
+        self.assertEqual(data.get("token_type"), "Bearer")

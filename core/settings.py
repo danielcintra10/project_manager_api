@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Project apps
     'accounts.apps.AccountsConfig',
+    'project_manager.apps.ProjectManagerConfig',
     # Third party packages
     'rest_framework',
     'simple_history',

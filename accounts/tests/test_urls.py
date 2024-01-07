@@ -1,7 +1,9 @@
 from django.urls import reverse, resolve
-from accounts.models import User
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from accounts.views import ListCreateUser, RetrieveUpdateDestroyUser, MyTokenObtainPairView
+
+User = get_user_model()
 
 
 class TestUrls(TestCase):

@@ -1,8 +1,9 @@
 from django.test import TestCase
-from rest_framework import serializers
+from django.contrib.auth import get_user_model
 from rest_framework.exceptions import AuthenticationFailed
-from accounts.models import User
 from api.serializers import UserSerializer, MyTokenObtainPairSerializer
+
+User = get_user_model()
 
 
 class TestUserSerializer(TestCase):
@@ -250,7 +251,7 @@ class TestMyTokenObtainPairSerializer(TestCase):
         assert 'token_type' in result
         assert result['token_type'] == 'Bearer'
 
-    def test_invalid_credentials_raise_authenticationfailed_error(self):
+    def test_invalid_credentials_raise_authentication_failed_error(self):
         serializer = MyTokenObtainPairSerializer()
         attrs = {'email': 'invaliduser', 'password': 'invalidpassword'}
 

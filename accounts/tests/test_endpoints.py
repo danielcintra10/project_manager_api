@@ -1,7 +1,9 @@
+from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
-from accounts.models import User
+
+User = get_user_model()
 
 
 class TestListCreateUser(APITestCase):

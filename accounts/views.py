@@ -1,14 +1,16 @@
+from django.contrib.auth import get_user_model
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import User
 from api.serializers import UserSerializer, MyTokenObtainPairSerializer
 from .permissions import IsAuthenticatedAndIsOwner, IsProjectManager
 
+User = get_user_model()
 
 # Create your views here.
+
 
 class ListCreateUser(ListCreateAPIView):
     queryset = User.objects.filter(is_active=True, deleted=False, is_superuser=False, )

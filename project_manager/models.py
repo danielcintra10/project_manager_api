@@ -1,9 +1,10 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 from .reference_model import Auditory
-from accounts.models import User
 from .utils import generate_unique_slug_code
 from .validators import validate_user_is_project_manager, validate_user_is_developer
 
+User = get_user_model()
 
 # Create your models here.
 

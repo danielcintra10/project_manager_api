@@ -18,11 +18,11 @@ class TestUser(TestCase):
                                                   password='1234')
 
         self.test_super_user = User.objects.create_superuser(email='dany@gmail.com',
-                                              first_name='Daniel',
-                                              last_name='Lopez',
-                                              role='D',
-                                              mobile_phone='+53 54876543',
-                                              password='fcb')
+                                                             first_name='Daniel',
+                                                             last_name='Lopez',
+                                                             role='D',
+                                                             mobile_phone='+53 54876543',
+                                                             password='fcb')
 
     def test_password_is_correct_encrypted(self):
         user = User.objects.filter(email__exact='robert@gmail.com').first()
@@ -38,7 +38,7 @@ class TestUser(TestCase):
         user.save()
         assert user.check_password('danyfcb10') is True
 
-    def test_update_user_with_partial_fields_do_not_affect_passowrd(self):
+    def test_update_user_with_partial_fields_do_not_affect_password(self):
         user = User.objects.filter(email__exact='robert@gmail.com').first()
         user.email = 'dany.webd3v@gmail.com'
         user.first_name = 'Daniel'

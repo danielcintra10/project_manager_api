@@ -290,3 +290,12 @@ class TestTask(TestCase):
                                            created_by=self.test_pm_user,
                                            updated_by=self.test_pm_user)
             new_task.full_clean()
+
+    def test_create_task_with_final_date_before_creation_date_return_validation_error(self):
+        with self.assertRaises(ValidationError):
+            new_task = Task.objects.create(title="Second Task created", description="Task very big Description",
+                                           developer=self.test_pm_user, project=self.test_project,
+                                           is_completed=False, final_date=date(2022, 10, 10),
+                                           created_by=self.test_pm_user,
+                                           updated_by=self.test_pm_user)
+            new_task.full_clean()

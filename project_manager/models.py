@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth import get_user_model
 from .reference_model import Auditory
@@ -51,6 +52,11 @@ class Task(Auditory):
         verbose_name = 'Task'
         verbose_name_plural = 'Tasks'
         ordering = ['-created_at', ]
+
+    def clean(self):
+        creation_date = self.created_at.date()
+        if self.final_date < creation_date:
+            raise ValidationError(f"The final date must be a future date, {self.final_date} is before {creation_date}")
 
     def __str__(self):
         return self.code

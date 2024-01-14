@@ -2,6 +2,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.utils import timezone
 from project_manager.models import Project, Task
 
 User = get_user_model()
@@ -73,9 +74,9 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = ('code', 'title', 'description', 'project',
                   'developer', 'is_completed', 'final_date',
-                  'is_active', 'created_at', 'updated_at', )
+                  'is_active', 'created_at', 'updated_at',)
         read_only_fields = ('code', 'created_at',
-                            'is_active', 'updated_at', )
+                            'is_active', 'updated_at',)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -84,6 +85,12 @@ class TaskSerializer(serializers.ModelSerializer):
         if fields:
             representation['project'] = instance.project.code
         return representation
+
+    def validate_final_date(self, value):
+        if value < timezone.now().date():
+            raise serializers.ValidationError(f"The final date must be a future date, "
+                                              f"{value} is before {timezone.now().date()}")
+        return value
 
     def create(self, validated_data):
         request = self.context.get("request")
@@ -105,8 +112,8 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ('code', 'name', 'description', 'project_manager', 'is_active', 'tasks', 'created_at', 'updated_at', )
-        read_only_fields = ('code', 'is_active', 'created_at', 'updated_at', )
+        fields = ('code', 'name', 'description', 'project_manager', 'is_active', 'tasks', 'created_at', 'updated_at',)
+        read_only_fields = ('code', 'is_active', 'created_at', 'updated_at',)
 
     def create(self, validated_data):
         request = self.context.get("request")

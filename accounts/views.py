@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework import status
@@ -46,6 +46,18 @@ class RetrieveUpdateDestroyUser(RetrieveUpdateDestroyAPIView):
         instance.is_active = False
         instance.save()
         return Response({'Response': 'User was successfully deleted'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class ListProjectManagerUsers(ListAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.filter(is_active=True, deleted=False, is_superuser=False, role="P")
+    permission_classes = [permissions.IsAdminUser | IsProjectManager]
+
+
+class ListDeveloperUsers(ListAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.filter(is_active=True, deleted=False, is_superuser=False, role="D")
+    permission_classes = [permissions.IsAdminUser | IsProjectManager]
 
 
 class MyTokenObtainPairView(TokenObtainPairView):

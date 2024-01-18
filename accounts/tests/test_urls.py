@@ -1,7 +1,8 @@
 from django.urls import reverse, resolve
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from accounts.views import ListCreateUser, RetrieveUpdateDestroyUser, MyTokenObtainPairView
+from accounts.views import ListCreateUser, RetrieveUpdateDestroyUser, MyTokenObtainPairView, \
+    ListDeveloperUsers, ListProjectManagerUsers
 
 User = get_user_model()
 
@@ -27,3 +28,11 @@ class TestUrls(TestCase):
     def test_token_obtain_pair_url_resolve(self):
         url = reverse('token_obtain_pair')
         self.assertEquals(resolve(url).func.view_class, MyTokenObtainPairView)
+
+    def test_list_project_manager_users_url_resolve(self):
+        url = reverse('list_project_manager_users')
+        self.assertEquals(resolve(url).func.view_class, ListProjectManagerUsers)
+
+    def test_list_developer_users_url_resolve(self):
+        url = reverse('list_developer_users')
+        self.assertEquals(resolve(url).func.view_class, ListDeveloperUsers)

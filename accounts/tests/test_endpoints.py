@@ -597,3 +597,201 @@ class TestLoginUser(APITestCase):
         }
         response = self.client.post('/api/v1/accounts/users/login', data=data)
         self.assertEqual(response.status_code, 401)
+
+
+class TestListProjectManagerUsers(APITestCase):
+    """Test /api/v1/accounts/users/p/ endpoint responses and permissions"""
+    def setUp(self):
+        self.test_pm_user = User.objects.create_user(email='robert@gmail.com',
+                                                     first_name='Robert',
+                                                     last_name='Lopez',
+                                                     role='P',
+                                                     mobile_phone='+53 59876543',
+                                                     password='Pass*2024*')
+
+        self.test_pm_user_2 = User.objects.create_user(email='lili@gmail.com',
+                                                       first_name='Lili',
+                                                       last_name='Tomas',
+                                                       role='P',
+                                                       mobile_phone='+53 2014783',
+                                                       password='Pass*2024*')
+
+        self.test_dev_user = User.objects.create_user(email='jeni@gmail.com',
+                                                      first_name='Jeni',
+                                                      last_name='Anderson',
+                                                      role='D',
+                                                      mobile_phone='+1 897456210',
+                                                      password='2024-the-year')
+
+        self.test_dev_user_2 = User.objects.create_user(email='bob@gmail.com',
+                                                        first_name='Bob',
+                                                        last_name='Miles',
+                                                        role='D',
+                                                        mobile_phone='+1 887540010',
+                                                        password='2024-the-year')
+
+        self.client = APIClient()
+        refresh = RefreshToken.for_user(self.test_pm_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(refresh.access_token)}')
+
+    def test_get_request_access_unauthenticated_user_returns_401(self):
+        self.client = APIClient()
+        response = self.client.get('/api/v1/accounts/users/p/')
+        self.assertEqual(response.status_code, 401)
+
+    def test_get_request_requested_dev_user_authenticated_returns_403(self):
+        self.client = APIClient()
+        refresh = RefreshToken.for_user(self.test_dev_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(refresh.access_token)}')
+        response = self.client.get('/api/v1/accounts/users/p/')
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_request_authenticated_user_returns_200(self):
+        response = self.client.get('/api/v1/accounts/users/p/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_request_authenticated_user_returns_200_and_count_equal_to_2(self):
+        response = self.client.get('/api/v1/accounts/users/p/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
+    def test_get_request_dont_returns_list_of_non_active_and_deleted_users(self):
+        self.test_pm_user = User.objects.create_user(email='camilo@gmail.com',
+                                                     first_name='Camilo',
+                                                     last_name='Pollock',
+                                                     role='P',
+                                                     mobile_phone='+1 500008787',
+                                                     password='Pass*2024*',
+                                                     is_active=False, )
+
+        self.test_pm_user_2 = User.objects.create_user(email='david@gmail.com',
+                                                       first_name='David',
+                                                       last_name='Chan',
+                                                       role='P',
+                                                       mobile_phone='+53 209898945',
+                                                       password='Pass*2024*',
+                                                       deleted=True,
+                                                       )
+        response = self.client.get('/api/v1/accounts/users/p/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
+    def test_get_request_dont_returns_list_of_non_project_manager_users(self):
+        self.test_pm_user = User.objects.create_user(email='camilo@gmail.com',
+                                                     first_name='Camilo',
+                                                     last_name='Pollock',
+                                                     role='P',
+                                                     mobile_phone='+1 500008787',
+                                                     password='Pass*2024*',
+                                                     )
+
+        self.test_pm_user_2 = User.objects.create_user(email='david@gmail.com',
+                                                       first_name='David',
+                                                       last_name='Chan',
+                                                       role='D',
+                                                       mobile_phone='+53 209898945',
+                                                       password='Pass*2024*',
+                                                       )
+        response = self.client.get('/api/v1/accounts/users/p/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 3)
+
+
+class TestListDevelopersUsers(APITestCase):
+    """Test /api/v1/accounts/users/d/ endpoint responses and permissions"""
+
+    def setUp(self):
+        self.test_pm_user = User.objects.create_user(email='robert@gmail.com',
+                                                     first_name='Robert',
+                                                     last_name='Lopez',
+                                                     role='P',
+                                                     mobile_phone='+53 59876543',
+                                                     password='Pass*2024*')
+
+        self.test_pm_user_2 = User.objects.create_user(email='lili@gmail.com',
+                                                       first_name='Lili',
+                                                       last_name='Tomas',
+                                                       role='P',
+                                                       mobile_phone='+53 2014783',
+                                                       password='Pass*2024*')
+
+        self.test_dev_user = User.objects.create_user(email='jeni@gmail.com',
+                                                      first_name='Jeni',
+                                                      last_name='Anderson',
+                                                      role='D',
+                                                      mobile_phone='+1 897456210',
+                                                      password='2024-the-year')
+
+        self.test_dev_user_2 = User.objects.create_user(email='bob@gmail.com',
+                                                        first_name='Bob',
+                                                        last_name='Miles',
+                                                        role='D',
+                                                        mobile_phone='+1 887540010',
+                                                        password='2024-the-year')
+
+        self.client = APIClient()
+        refresh = RefreshToken.for_user(self.test_pm_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(refresh.access_token)}')
+
+    def test_get_request_access_unauthenticated_user_returns_401(self):
+        self.client = APIClient()
+        response = self.client.get('/api/v1/accounts/users/d/')
+        self.assertEqual(response.status_code, 401)
+
+    def test_get_request_requested_dev_user_authenticated_returns_403(self):
+        self.client = APIClient()
+        refresh = RefreshToken.for_user(self.test_dev_user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {str(refresh.access_token)}')
+        response = self.client.get('/api/v1/accounts/users/d/')
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_request_authenticated_user_returns_200(self):
+        response = self.client.get('/api/v1/accounts/users/d/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_request_authenticated_user_returns_200_and_count_equal_to_2(self):
+        response = self.client.get('/api/v1/accounts/users/p/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
+    def test_get_request_dont_returns_list_of_non_active_and_deleted_users(self):
+        self.test_pm_user = User.objects.create_user(email='camilo@gmail.com',
+                                                     first_name='Camilo',
+                                                     last_name='Pollock',
+                                                     role='D',
+                                                     mobile_phone='+1 500008787',
+                                                     password='Pass*2024*',
+                                                     is_active=False, )
+
+        self.test_pm_user_2 = User.objects.create_user(email='david@gmail.com',
+                                                       first_name='David',
+                                                       last_name='Chan',
+                                                       role='D',
+                                                       mobile_phone='+53 209898945',
+                                                       password='Pass*2024*',
+                                                       deleted=True,
+                                                       )
+        response = self.client.get('/api/v1/accounts/users/d/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
+    def test_get_request_dont_returns_list_of_non_dev_users(self):
+        self.test_pm_user = User.objects.create_user(email='camilo@gmail.com',
+                                                     first_name='Camilo',
+                                                     last_name='Pollock',
+                                                     role='D',
+                                                     mobile_phone='+1 500008787',
+                                                     password='Pass*2024*',
+                                                     )
+
+        self.test_pm_user_2 = User.objects.create_user(email='david@gmail.com',
+                                                       first_name='David',
+                                                       last_name='Chan',
+                                                       role='P',
+                                                       mobile_phone='+53 209898945',
+                                                       password='Pass*2024*',
+                                                       )
+        response = self.client.get('/api/v1/accounts/users/d/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 3)
+

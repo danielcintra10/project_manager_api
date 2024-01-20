@@ -4,11 +4,14 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.utils import timezone
 from project_manager.models import Project, Task
+from accounts.utils import get_role_db_value
 
 User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(source='get_role_display', read_only=False, required=False)
+
     class Meta:
         model = User
         fields = (
@@ -30,15 +33,38 @@ class UserSerializer(serializers.ModelSerializer):
         validate_password(password)
         return password
 
-    def update(self, instance, validated_data):
-        password = validated_data.pop('password', None)
-        user = super().update(instance, validated_data)
+    def validate_role(self, role):
+        if role not in ["Developer", "Project Manager"]:
+            raise serializers.ValidationError(f"User role must be 'Developer' or 'Project Manager', "
+                                              f"{role} is not a valid value")
+        return role
 
-        if password:
-            user.set_password(password)
-            user.save()
-
+    def create(self, validated_data):
+        role_display = self.initial_data.get('role', 'Developer')
+        role = get_role_db_value(role_display)
+        password = validated_data.get('password', None)
+        first_name = validated_data.get('first_name', None)
+        last_name = validated_data.get('last_name', None)
+        email = validated_data.get('email', None)
+        mobile_phone = validated_data.get('mobile_phone', None)
+        user = User.objects.create(email=email, first_name=first_name,
+                                   last_name=last_name, mobile_phone=mobile_phone,
+                                   role=role, password=password)
         return user
+
+    def update(self, instance, validated_data):
+        password = validated_data.get('password', None)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.email = validated_data.get('email', instance.email)
+        instance.mobile_phone = validated_data.get('mobile_phone', instance.mobile_phone)
+        role_display = self.initial_data.get('role', None)
+        if role_display:
+            instance.role = get_role_db_value(role_display)
+        if password:
+            instance.set_password(password)
+        instance.save()
+        return instance
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):

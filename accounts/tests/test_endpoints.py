@@ -62,7 +62,7 @@ class TestListCreateUser(APITestCase):
             'email': 'camille@gmail.com',
             'first_name': 'Camila',
             'last_name': 'Ernst',
-            'role': 'D',
+            'role': 'Developer',
             'mobile_phone': '+53 89410023',
             'password': 'CamiOop44',
         }
@@ -75,7 +75,7 @@ class TestListCreateUser(APITestCase):
             'email': 'camille@gmail.com',
             'first_name': 'Camila',
             'last_name': 'Ernst',
-            'role': 'D',
+            'role': 'Developer',
             'mobile_phone': '+53 89410023',
             'password': 'CamiOop44',
         }
@@ -89,7 +89,7 @@ class TestListCreateUser(APITestCase):
             'email': 'camille@gmail.com',
             'first_name': 'Camila',
             'last_name': 'Ernst',
-            'role': 'D',
+            'role': 'Developer',
             'mobile_phone': '+53 89410023',
             'password': 'CamiOop44',
         }
@@ -103,7 +103,7 @@ class TestListCreateUser(APITestCase):
         self.assertEqual(response.data["last_name"], user.last_name)
         self.assertEqual(response.data["email"], user.email)
         self.assertEqual(response.data["mobile_phone"], user.mobile_phone)
-        self.assertEqual(response.data["role"], user.role)
+        self.assertEqual(response.data["role"], user.get_role_display())
         self.assertEqual(response.data["is_active"], user.is_active)
 
     def test_post_request_new_user_password_is_encrypted_ok(self):
@@ -111,7 +111,7 @@ class TestListCreateUser(APITestCase):
             'email': 'camille@gmail.com',
             'first_name': 'Camila',
             'last_name': 'Ernst',
-            'role': 'D',
+            'role': 'Developer',
             'mobile_phone': '+53 89410023',
             'password': 'CamiOop44',
         }
@@ -126,7 +126,7 @@ class TestListCreateUser(APITestCase):
             'email': 'dany@gmail.com',
             'first_name': 'Camila',
             'last_name': 'Ernst',
-            'role': 'D',
+            'role': 'Developer',
             'mobile_phone': '+53 89410023',
             'password': 'CamiOop44',
         }
@@ -139,7 +139,7 @@ class TestListCreateUser(APITestCase):
             'email': 'camille@gmail.com',
             'first_name': 'Camila',
             'last_name': 'Ernst',
-            'role': 'D',
+            'role': 'Developer',
             'mobile_phone': '+53 59876543',
             'password': 'CamiOop44',
         }
@@ -152,7 +152,7 @@ class TestListCreateUser(APITestCase):
             'email': 'camille@gmail.com',
             'first_name': 'Camila',
             'last_name': 'Ernst',
-            'role': 'D',
+            'role': 'Developer',
             'mobile_phone': '+53 89410023',
             'password': '1234',
         }
@@ -165,7 +165,7 @@ class TestListCreateUser(APITestCase):
             'email': 'email',
             'first_name': 'Camila',
             'last_name': 'Ernst',
-            'role': 'D',
+            'role': 'Developer',
             'mobile_phone': '+53 89410023',
             'password': 'CamiOop44',
         }
@@ -178,7 +178,7 @@ class TestListCreateUser(APITestCase):
             'email': 'camille@gmail.com',
             'first_name': 'Camila87**',
             'last_name': 'Ernst',
-            'role': 'D',
+            'role': 'Developer',
             'mobile_phone': '+53 89410023',
             'password': 'CamiOop44',
         }
@@ -191,7 +191,7 @@ class TestListCreateUser(APITestCase):
             'email': 'camille@gmail.com',
             'first_name': 'Camila',
             'last_name': 'Ernst88**',
-            'role': 'D',
+            'role': 'Developer',
             'mobile_phone': '+53 89410023',
             'password': 'CamiOop44',
         }
@@ -204,7 +204,7 @@ class TestListCreateUser(APITestCase):
             'email': 'camille@gmail.com',
             'first_name': 'Camila',
             'last_name': 'Ernst',
-            'role': 'D',
+            'role': 'Developer',
             'mobile_phone': '+53 ahy98*/',
             'password': 'CamiOop44',
         }
@@ -282,7 +282,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
         self.assertEqual(response.data["last_name"], user.last_name)
         self.assertEqual(response.data["email"], user.email)
         self.assertEqual(response.data["mobile_phone"], user.mobile_phone)
-        self.assertEqual(response.data["role"], user.role)
+        self.assertEqual(response.data["role"], user.get_role_display())
         self.assertEqual(response.data["is_active"], user.is_active)
 
     def test_get_request_return_correct_data_pm_user_authenticated(self):
@@ -296,7 +296,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
         self.assertEqual(response.data["last_name"], user.last_name)
         self.assertEqual(response.data["email"], user.email)
         self.assertEqual(response.data["mobile_phone"], user.mobile_phone)
-        self.assertEqual(response.data["role"], user.role)
+        self.assertEqual(response.data["role"], user.get_role_display())
         self.assertEqual(response.data["is_active"], user.is_active)
 
     def test_get_request_return_correct_data_dev_user_authenticated_and_owner(self):
@@ -310,7 +310,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
         self.assertEqual(response.data["last_name"], user.last_name)
         self.assertEqual(response.data["email"], user.email)
         self.assertEqual(response.data["mobile_phone"], user.mobile_phone)
-        self.assertEqual(response.data["role"], user.role)
+        self.assertEqual(response.data["role"], user.get_role_display())
         self.assertEqual(response.data["is_active"], user.is_active)
 
     def test_get_request_access_authenticated_pm_user_cant_see_super_users_returns_403(self):
@@ -327,7 +327,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
             'email': 'robert@gmail.com',
             'first_name': 'Robertico JR',
             'last_name': 'Lopez',
-            'role': 'P',
+            'role': 'Project Manager',
             'mobile_phone': '+53 598765000',
             'password': 'Pass*2024*',
         }
@@ -342,7 +342,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
             'email': 'boby@gmail.com',
             'first_name': 'Robertico JR',
             'last_name': 'Lopez',
-            'role': 'P',
+            'role': 'Project Manager',
             'mobile_phone': '+59 598787000',
             'password': 'Pass*2024*',
         }
@@ -357,7 +357,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
             'email': 'robert@gmail.com',
             'first_name': 'Robertico JR',
             'last_name': 'Lopez',
-            'role': 'P',
+            'role': 'Project Manager',
             'mobile_phone': '+53 598765000',
             'password': 'Pass*2024*',
         }
@@ -369,7 +369,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
             'email': 'robert@gmail.com',
             'first_name': 'Robertico JR',
             'last_name': 'Lopez',
-            'role': 'P',
+            'role': 'Project Manager',
             'mobile_phone': '+53 598765070',
             'password': 'Pass*2024*',
         }
@@ -384,7 +384,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
             'email': 'robert@gmail.com',
             'first_name': 'Robertico JR',
             'last_name': 'Lopez',
-            'role': 'P',
+            'role': 'Project Manager',
             'mobile_phone': '+53 598765070',
             'password': 'Pass*2024*',
         }
@@ -399,7 +399,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
             'email': 'jeni@gmail.com',
             'first_name': 'Jennifer',
             'last_name': 'Torres',
-            'role': 'P',
+            'role': 'Project Manager',
             'mobile_phone': '+34 85025455',
             'password': 'Pass*2024*',
         }
@@ -411,7 +411,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
             'email': 'bobby@gmail.com',
             'first_name': 'Bobby JR',
             'last_name': 'Know',
-            'role': 'D',
+            'role': 'Developer',
             'mobile_phone': '+53 598767888',
             'password': 'Pass*new*pass*2024',
         }
@@ -423,7 +423,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
         self.assertEqual(response.data["last_name"], user.last_name)
         self.assertEqual(response.data["email"], user.email)
         self.assertEqual(response.data["mobile_phone"], user.mobile_phone)
-        self.assertEqual(response.data["role"], user.role)
+        self.assertEqual(response.data["role"], user.get_role_display())
         self.assertEqual(response.data["is_active"], user.is_active)
         self.assertTrue(user.check_password('Pass*new*pass*2024'))
 
@@ -435,7 +435,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
             'email': 'bobby@gmail.com',
             'first_name': 'Bobby JR',
             'last_name': 'Know',
-            'role': 'D',
+            'role': 'Developer',
             'mobile_phone': '+53 598767888',
             'password': 'Pass*new*pass*2024',
         }
@@ -447,7 +447,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
         self.assertEqual(response.data["last_name"], user.last_name)
         self.assertEqual(response.data["email"], user.email)
         self.assertEqual(response.data["mobile_phone"], user.mobile_phone)
-        self.assertEqual(response.data["role"], user.role)
+        self.assertEqual(response.data["role"], user.get_role_display())
         self.assertEqual(response.data["is_active"], user.is_active)
         self.assertTrue(user.check_password('Pass*new*pass*2024'))
 
@@ -464,7 +464,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
             'email': 'boby@gmail.com',
             'first_name': 'Robertico JR',
             'last_name': 'Lopez',
-            'role': 'P',
+            'role': 'Project Manager',
             'mobile_phone': '+59 598787000',
             'password': 'Pass*2024*',
         }
@@ -479,7 +479,7 @@ class TestRetrieveUpdateDestroyUser(APITestCase):
             'email': 'robert@gmail.com',
             'first_name': 'Robertico JR',
             'last_name': 'Lopez',
-            'role': 'P',
+            'role': 'Project Manager',
             'mobile_phone': '+53 598765000',
             'password': 'Pass*2024*',
         }

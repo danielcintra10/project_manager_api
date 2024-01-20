@@ -23,7 +23,7 @@ class TestUserSerializer(TestCase):
         self.assertEqual('Robert', serializer.data.get("first_name"))
         self.assertEqual('Lopez', serializer.data.get("last_name"))
         self.assertEqual('robert@gmail.com', serializer.data.get("email"))
-        self.assertEqual('D', serializer.data.get("role"))
+        self.assertEqual('Developer', serializer.data.get("role"))
         self.assertEqual('+53 59876543', serializer.data.get("mobile_phone"))
         self.assertTrue("password" not in serializer.data)
         self.assertTrue(serializer.data.get("is_active"))
@@ -38,11 +38,11 @@ class TestUserSerializer(TestCase):
             "last_name": "Doe",
             "email": "johndoe@example.com",
             "mobile_phone": "+1 123456789",
-            "role": "D",
+            "role": "Developer",
             "password": "StrongPassword123",
         }
         serializer = UserSerializer(data=serialized_data)
-        self.assertTrue(serializer.is_valid(raise_exception=True))
+        self.assertTrue(serializer.is_valid())
         user = serializer.save()
         self.assertEqual(user.first_name, "John")
         self.assertEqual(user.last_name, "Doe")
@@ -62,7 +62,7 @@ class TestUserSerializer(TestCase):
             "last_name": "Doe",
             "email": "johndoe@example.com",
             "mobile_phone": "+1 123456789",
-            "role": "P",
+            "role": "Project Manager",
             "password": "Pass78*80",
         }
         serializer = UserSerializer(instance=user, data=updated_data, partial=False)
@@ -126,11 +126,11 @@ class TestUserSerializer(TestCase):
             "last_name": "Doe",
             "email": "johndoe@example.com",
             "mobile_phone": "+1 123456789",
-            "role": "D",
+            "role": "Developer",
             "password": "StrongPassword123",
         }
         serializer = UserSerializer(data=serialized_data)
-        self.assertTrue(serializer.is_valid(raise_exception=True))
+        self.assertTrue(serializer.is_valid())
         with self.assertRaises(KeyError):
             id = serializer.validated_data["id"]
             is_active = serializer.validated_data["is_active"]
@@ -143,11 +143,11 @@ class TestUserSerializer(TestCase):
             "last_name": "Doe",
             "email": "johndoe@example.com",
             "mobile_phone": "+1 123456789",
-            "role": "D",
+            "role": "Developer",
             "password": "StrongPassword123",
         }
         serializer = UserSerializer(data=serialized_data)
-        self.assertTrue(serializer.is_valid(raise_exception=True))
+        self.assertTrue(serializer.is_valid())
         serializer.save()
         user = User.objects.filter(email__exact='johndoe@example.com').first()
         self.assertEqual(User.objects.count(), 2)
@@ -169,7 +169,7 @@ class TestUserSerializer(TestCase):
             # This email already exist
             "email": "robert@gmail.com",
             "mobile_phone": "+1 123456789",
-            "role": "D",
+            "role": "Developer",
             "password": "StrongPassword123",
         }
         serializer = UserSerializer(data=serialized_data)
@@ -182,7 +182,7 @@ class TestUserSerializer(TestCase):
             "email": "johndoe@example.com",
             # This mobile_phone already exist
             "mobile_phone": "+53 59876543",
-            "role": "D",
+            "role": "Developer",
             "password": "StrongPassword123",
         }
         serializer = UserSerializer(data=serialized_data)
@@ -193,9 +193,8 @@ class TestUserSerializer(TestCase):
             "first_name": "John",
             "last_name": "Doe",
             "email": "johndoe",
-            # This mobile_phone already exist
-            "mobile_phone": "59876543RTY**",
-            "role": "D",
+            "mobile_phone": "59876543RTY",
+            "role": "Developer",
             "password": "StrongPassword123",
         }
         serializer = UserSerializer(data=serialized_data)
@@ -208,7 +207,7 @@ class TestUserSerializer(TestCase):
             "email": "johndoe@example.com",
             # This mobile_phone already exist
             "mobile_phone": "+53 59876543",
-            "role": "D",
+            "role": "Developer",
             "password": "StrongPassword123",
         }
         serializer = UserSerializer(data=serialized_data)
@@ -219,9 +218,37 @@ class TestUserSerializer(TestCase):
             "first_name": "John",
             "last_name": "Doe",
             "email": "johndoe@example.com",
-            # This mobile_phone already exist
             "mobile_phone": "59876543RTY**",
-            "role": "D",
+            "role": "Developer",
+            "password": "StrongPassword123",
+        }
+        serializer = UserSerializer(data=serialized_data)
+        self.assertFalse(serializer.is_valid())
+
+    def test_update_field_role_with_valid_data(self):
+        serialized_data = {
+            "role": "Project Manager"
+        }
+        serializer = UserSerializer(data=serialized_data, instance=self.test_user, partial=True)
+        self.assertTrue(serializer.is_valid())
+        serializer.save()
+        user = User.objects.filter(email__exact='robert@gmail.com').first()
+        self.assertEqual(user.role, 'P')
+
+    def test_update_field_role_with_wrong_data(self):
+        serialized_data = {
+            "role": "P"
+        }
+        serializer = UserSerializer(data=serialized_data, instance=self.test_user, partial=True)
+        self.assertFalse(serializer.is_valid())
+
+    def test_validate_role_field(self):
+        serialized_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "johndoe@example.com",
+            "mobile_phone": "+88 77545455",
+            "role": "Wrong Role",
             "password": "StrongPassword123",
         }
         serializer = UserSerializer(data=serialized_data)

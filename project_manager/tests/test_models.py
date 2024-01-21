@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
 from datetime import date
-from project_manager.models import Project, Task
+from project_manager.models import Project, Task, EmailLog
 
 User = get_user_model()
 
@@ -299,3 +299,60 @@ class TestTask(TestCase):
                                            created_by=self.test_pm_user,
                                            updated_by=self.test_pm_user)
             new_task.full_clean()
+
+
+class TestEmailLog(TestCase):
+    """Test EmailLog model to check if works properly"""
+
+    def setUp(self):
+        self.test_dev_user = User.objects.create_user(email='robert@gmail.com',
+                                                      first_name='Robert',
+                                                      last_name='Lopez',
+                                                      role='D',
+                                                      mobile_phone='+53 59876543',
+                                                      password='1234')
+
+        self.test_pm_user = User.objects.create_user(email='dany@gmail.com',
+                                                     first_name='Daniel',
+                                                     last_name='Lopez',
+                                                     role='P',
+                                                     mobile_phone='+53 54876543',
+                                                     password='fcb')
+
+        self.test_project = Project.objects.create(name="Test Project", description="Project Description",
+                                                   project_manager=self.test_pm_user, created_by=self.test_pm_user,
+                                                   updated_by=self.test_pm_user)
+
+        self.test_task = Task.objects.create(title="Test Task", description="Task Description",
+                                             developer=self.test_dev_user, project=self.test_project,
+                                             is_completed=False, final_date=date(2023, 1, 30),
+                                             created_by=self.test_pm_user,
+                                             updated_by=self.test_pm_user)
+
+    def test_create_new_email_log_with_valid_data(self):
+        email_log = EmailLog.objects.create(destination_email=self.test_dev_user.email,
+                                            email_purpose="C",
+                                            task=self.test_task,
+                                            delivered=True,
+                                            )
+        self.assertEqual(EmailLog.objects.count(), 1)
+
+    def test_create_new_email_log_returns_correct_data(self):
+        email_log = EmailLog.objects.create(destination_email=self.test_dev_user.email,
+                                            email_purpose="C",
+                                            task=self.test_task,
+                                            delivered=True,
+                                            )
+        self.assertEqual(EmailLog.objects.count(), 1)
+        log = EmailLog.objects.first()
+        self.assertEqual(log.destination_email, self.test_dev_user.email)
+        self.assertEqual(log.email_purpose, "C")
+        self.assertEqual(log.task, self.test_task)
+        self.assertEqual(log.delivered, True)
+        self.assertEqual(log.error_info, None)
+
+    def test_error_when_create_a_email_log_with_missing_fields(self):
+        with self.assertRaises(Exception):
+            email_log = EmailLog.objects.create(destination_email=self.test_dev_user.email,
+                                                delivered=True,
+                                                )

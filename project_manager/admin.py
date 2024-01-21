@@ -1,5 +1,5 @@
 from django.contrib import admin
-from . models import Project, Task
+from . models import Project, Task, EmailLog
 
 # Register your models here.
 
@@ -16,5 +16,12 @@ class TaskAdmin(admin.ModelAdmin):
     list_filter = ['code', 'title', ]
 
 
+class EmailLogAdmin(admin.ModelAdmin):
+    readonly_fields = ('destination_email', 'email_purpose', 'task', 'delivered', 'error_info', 'created_at', )
+    list_display = ['destination_email', 'email_purpose', 'task', 'delivered', 'error_info', 'created_at',]
+    list_filter = ['destination_email', 'email_purpose', 'delivered', 'task', ]
+
+
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(Task, TaskAdmin)
+admin.site.register(EmailLog, EmailLogAdmin)

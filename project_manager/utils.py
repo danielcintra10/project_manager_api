@@ -16,3 +16,5 @@ def generate_unique_slug_code(name, model):
         code = generate_slug(name)
     return code
 
+
+email_purpose = [("C", "Task Created"), ("F", "Task Finished")]

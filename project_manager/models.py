@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth import get_user_model
 from .reference_model import Auditory
-from .utils import generate_unique_slug_code
+from .utils import generate_unique_slug_code, email_purpose
 from .validators import validate_user_is_project_manager, validate_user_is_developer
 
 User = get_user_model()
@@ -60,3 +60,21 @@ class Task(Auditory):
 
     def __str__(self):
         return self.code
+
+
+class EmailLog(models.Model):
+    # Redundancy added to reduce database query
+    destination_email = models.EmailField(unique=False, verbose_name='Destination Email')
+    email_purpose = models.CharField(max_length=1, choices=email_purpose, verbose_name='Email Purpose')
+    task = models.ForeignKey(Task, on_delete=models.DO_NOTHING, verbose_name='Task')
+    delivered = models.BooleanField(default=False, verbose_name='Delivered')
+    error_info = models.TextField(blank=True, null=True, verbose_name='Error Info')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Email Log'
+        verbose_name_plural = 'Email Logs'
+        ordering = ['-created_at', ]
+
+    def __str__(self):
+        return f"email log {self.pk}"

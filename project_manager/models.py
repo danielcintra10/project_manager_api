@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from .reference_model import Auditory
 from .utils import generate_unique_slug_code, email_purpose
 from .validators import validate_user_is_project_manager, validate_user_is_developer
@@ -54,9 +55,8 @@ class Task(Auditory):
         ordering = ['-created_at', ]
 
     def clean(self):
-        creation_date = self.created_at.date()
-        if self.final_date < creation_date:
-            raise ValidationError(f"The final date must be a future date, {self.final_date} is before {creation_date}")
+        if self.final_date < timezone.now().date():
+            raise ValidationError(f"The final date must be a future date, {self.final_date} is before today")
 
     def __str__(self):
         return self.code

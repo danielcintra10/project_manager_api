@@ -15,12 +15,18 @@ class Command(BaseCommand):
             month_of_year="*",
         )
         # The condition is used to prevent repeated tasks, in case the user executes this command more than once.
-        task = PeriodicTask.objects.filter(name='Completed task finder').first()
+        task = PeriodicTask.objects.filter(
+            name="Completed task finder"
+        ).first()
         if not task:
             PeriodicTask.objects.create(
                 crontab=schedule,
-                name='Completed task finder',
-                task='project_manager.tasks.send_email_to_project_manager_if_task_has_reached_its_deadline',
+                name="Completed task finder",
+                task="project_manager.tasks.send_email_to_project_manager_if_task_has_reached_its_deadline",
             )
-            print("Task configured successfully, you dont need to run this command again")
-        print("The task was previously configured, you dont need to run this command again")
+            print(
+                "Task configured successfully, you dont need to run this command again"
+            )
+        print(
+            "The task was previously configured, you dont need to run this command again"
+        )

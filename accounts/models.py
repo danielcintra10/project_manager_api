@@ -1,5 +1,9 @@
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.auth.models import (
+    BaseUserManager,
+    AbstractBaseUser,
+    PermissionsMixin,
+)
 from simple_history.models import HistoricalRecords
 from .validators import validate_name, validate_mobile_phone
 from .utils import user_roles
@@ -27,7 +31,9 @@ class CustomUserManager(BaseUserManager):
         if not extra_fields.get("is_staff"):
             raise ValueError("Super user must be assigned to is_staff=True.")
         if not extra_fields.get("is_superuser"):
-            raise ValueError("Super user must be assigned to is_super_user=True.")
+            raise ValueError(
+                "Super user must be assigned to is_super_user=True."
+            )
         return self.create_user(email, password, **extra_fields)
 
     def create(self, email=None, password=None, **extra_fields):
@@ -35,21 +41,55 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    first_name = models.CharField(max_length=50, validators=[validate_name, ], verbose_name="Name", )
-    last_name = models.CharField(max_length=50, validators=[validate_name, ], verbose_name="Last Name", )
-    email = models.EmailField(unique=True, verbose_name="Email", )
-    mobile_phone = models.CharField(unique=True, validators=[validate_mobile_phone, ], verbose_name="Mobile Phone", )
-    role = models.CharField(max_length=1, choices=user_roles, default="D", verbose_name="Role")
-    is_staff = models.BooleanField(default=False, )
-    is_active = models.BooleanField(default=True, )
-    deleted = models.BooleanField(default=False, )
+    first_name = models.CharField(
+        max_length=50,
+        validators=[
+            validate_name,
+        ],
+        verbose_name="Name",
+    )
+    last_name = models.CharField(
+        max_length=50,
+        validators=[
+            validate_name,
+        ],
+        verbose_name="Last Name",
+    )
+    email = models.EmailField(
+        unique=True,
+        verbose_name="Email",
+    )
+    mobile_phone = models.CharField(
+        unique=True,
+        validators=[
+            validate_mobile_phone,
+        ],
+        verbose_name="Mobile Phone",
+    )
+    role = models.CharField(
+        max_length=1, choices=user_roles, default="D", verbose_name="Role"
+    )
+    is_staff = models.BooleanField(
+        default=False,
+    )
+    is_active = models.BooleanField(
+        default=True,
+    )
+    deleted = models.BooleanField(
+        default=False,
+    )
     creation_date = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
     history = HistoricalRecords()
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'mobile_phone', 'role', ]
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = [
+        "first_name",
+        "last_name",
+        "mobile_phone",
+        "role",
+    ]
 
     class Meta:
         verbose_name = "User"

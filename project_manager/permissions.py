@@ -7,7 +7,7 @@ User = get_user_model()
 
 class IsRequestedDeveloper(permissions.BasePermission):
     def has_permission(self, request, view):
-        developer_id = view.kwargs['developer_id']
+        developer_id = view.kwargs["developer_id"]
         developer = User.objects.filter(id=developer_id).first()
         return developer == request.user
 

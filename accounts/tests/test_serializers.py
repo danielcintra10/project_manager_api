@@ -10,21 +10,23 @@ class TestUserSerializer(TestCase):
     """Test UserSerializer to check if works properly"""
 
     def setUp(self):
-        self.test_user = User.objects.create_user(email='robert@gmail.com',
-                                                  first_name='Robert',
-                                                  last_name='Lopez',
-                                                  role='D',
-                                                  mobile_phone='+53 59876543',
-                                                  password='strongpass2024')
+        self.test_user = User.objects.create_user(
+            email="robert@gmail.com",
+            first_name="Robert",
+            last_name="Lopez",
+            role="D",
+            mobile_phone="+53 59876543",
+            password="strongpass2024",
+        )
 
     def test_serialize_user_data_ok(self):
-        user = User.objects.filter(email__exact='robert@gmail.com').first()
+        user = User.objects.filter(email__exact="robert@gmail.com").first()
         serializer = UserSerializer(user, many=False)
-        self.assertEqual('Robert', serializer.data.get("first_name"))
-        self.assertEqual('Lopez', serializer.data.get("last_name"))
-        self.assertEqual('robert@gmail.com', serializer.data.get("email"))
-        self.assertEqual('Developer', serializer.data.get("role"))
-        self.assertEqual('+53 59876543', serializer.data.get("mobile_phone"))
+        self.assertEqual("Robert", serializer.data.get("first_name"))
+        self.assertEqual("Lopez", serializer.data.get("last_name"))
+        self.assertEqual("robert@gmail.com", serializer.data.get("email"))
+        self.assertEqual("Developer", serializer.data.get("role"))
+        self.assertEqual("+53 59876543", serializer.data.get("mobile_phone"))
         self.assertTrue("password" not in serializer.data)
         self.assertTrue(serializer.data.get("is_active"))
         self.assertTrue("is_super_user" not in serializer.data)
@@ -56,7 +58,7 @@ class TestUserSerializer(TestCase):
         self.assertFalse(user.is_superuser)
 
     def test_update_valid_user_object_no_partial_data(self):
-        user = User.objects.filter(email__exact='robert@gmail.com').first()
+        user = User.objects.filter(email__exact="robert@gmail.com").first()
         updated_data = {
             "first_name": "John",
             "last_name": "Doe",
@@ -65,7 +67,9 @@ class TestUserSerializer(TestCase):
             "role": "Project Manager",
             "password": "Pass78*80",
         }
-        serializer = UserSerializer(instance=user, data=updated_data, partial=False)
+        serializer = UserSerializer(
+            instance=user, data=updated_data, partial=False
+        )
         self.assertTrue(serializer.is_valid())
         user = serializer.save()
         self.assertEqual(user.first_name, "John")
@@ -80,13 +84,15 @@ class TestUserSerializer(TestCase):
         self.assertFalse(user.is_superuser)
 
     def test_update_valid_user_object_with_partial_data(self):
-        user = User.objects.filter(email__exact='robert@gmail.com').first()
+        user = User.objects.filter(email__exact="robert@gmail.com").first()
         updated_data = {
             "first_name": "John",
             "last_name": "Doe",
             "email": "johndoe@example.com",
         }
-        serializer = UserSerializer(instance=user, data=updated_data, partial=True)
+        serializer = UserSerializer(
+            instance=user, data=updated_data, partial=True
+        )
         self.assertTrue(serializer.is_valid())
         user = serializer.save()
         # Fields updated
@@ -103,21 +109,25 @@ class TestUserSerializer(TestCase):
         self.assertFalse(user.is_superuser)
 
     def test_user_can_update_password(self):
-        user = User.objects.filter(email__exact='robert@gmail.com').first()
+        user = User.objects.filter(email__exact="robert@gmail.com").first()
         updated_data = {
             "password": "Password/new01/**",
         }
-        serializer = UserSerializer(instance=user, data=updated_data, partial=True)
+        serializer = UserSerializer(
+            instance=user, data=updated_data, partial=True
+        )
         self.assertTrue(serializer.is_valid())
         user = serializer.save()
         self.assertTrue(user.check_password("Password/new01/**"))
 
     def test_validation_error_weak_password(self):
-        user = User.objects.filter(email__exact='robert@gmail.com').first()
+        user = User.objects.filter(email__exact="robert@gmail.com").first()
         updated_data = {
             "password": "1234",
         }
-        serializer = UserSerializer(instance=user, data=updated_data, partial=True)
+        serializer = UserSerializer(
+            instance=user, data=updated_data, partial=True
+        )
         self.assertFalse(serializer.is_valid())
 
     def test_read_only_fields_not_when_deserialize(self):
@@ -149,7 +159,7 @@ class TestUserSerializer(TestCase):
         serializer = UserSerializer(data=serialized_data)
         self.assertTrue(serializer.is_valid())
         serializer.save()
-        user = User.objects.filter(email__exact='johndoe@example.com').first()
+        user = User.objects.filter(email__exact="johndoe@example.com").first()
         self.assertEqual(User.objects.count(), 2)
         self.assertEqual(user.first_name, "John")
         self.assertEqual(user.last_name, "Doe")
@@ -226,20 +236,20 @@ class TestUserSerializer(TestCase):
         self.assertFalse(serializer.is_valid())
 
     def test_update_field_role_with_valid_data(self):
-        serialized_data = {
-            "role": "Project Manager"
-        }
-        serializer = UserSerializer(data=serialized_data, instance=self.test_user, partial=True)
+        serialized_data = {"role": "Project Manager"}
+        serializer = UserSerializer(
+            data=serialized_data, instance=self.test_user, partial=True
+        )
         self.assertTrue(serializer.is_valid())
         serializer.save()
-        user = User.objects.filter(email__exact='robert@gmail.com').first()
-        self.assertEqual(user.role, 'P')
+        user = User.objects.filter(email__exact="robert@gmail.com").first()
+        self.assertEqual(user.role, "P")
 
     def test_update_field_role_with_wrong_data(self):
-        serialized_data = {
-            "role": "P"
-        }
-        serializer = UserSerializer(data=serialized_data, instance=self.test_user, partial=True)
+        serialized_data = {"role": "P"}
+        serializer = UserSerializer(
+            data=serialized_data, instance=self.test_user, partial=True
+        )
         self.assertFalse(serializer.is_valid())
 
     def test_validate_role_field(self):
@@ -259,28 +269,30 @@ class TestMyTokenObtainPairSerializer(TestCase):
     """Test MyTokenObtainPairSerializer to check if works properly"""
 
     def setUp(self):
-        self.test_user = User.objects.create_user(email='robert@gmail.com',
-                                                  first_name='Robert',
-                                                  last_name='Lopez',
-                                                  role='D',
-                                                  mobile_phone='+53 59876543',
-                                                  password='Pass*2024*')
+        self.test_user = User.objects.create_user(
+            email="robert@gmail.com",
+            first_name="Robert",
+            last_name="Lopez",
+            role="D",
+            mobile_phone="+53 59876543",
+            password="Pass*2024*",
+        )
 
     def test_validate_method_returns_expected_data_representation(self):
         serializer = MyTokenObtainPairSerializer()
-        attrs = {'email': 'robert@gmail.com', 'password': 'Pass*2024*'}
+        attrs = {"email": "robert@gmail.com", "password": "Pass*2024*"}
 
         result = serializer.validate(attrs)
 
-        assert 'user' in result
-        assert 'access_token' in result
-        assert 'refresh_token' in result
-        assert 'token_type' in result
-        assert result['token_type'] == 'Bearer'
+        assert "user" in result
+        assert "access_token" in result
+        assert "refresh_token" in result
+        assert "token_type" in result
+        assert result["token_type"] == "Bearer"
 
     def test_invalid_credentials_raise_authentication_failed_error(self):
         serializer = MyTokenObtainPairSerializer()
-        attrs = {'email': 'invaliduser', 'password': 'invalidpassword'}
+        attrs = {"email": "invaliduser", "password": "invalidpassword"}
 
         with self.assertRaises(AuthenticationFailed):
             serializer.validate(attrs)
@@ -294,22 +306,22 @@ class TestMyTokenObtainPairSerializer(TestCase):
 
     def test_user_object_correctly_serialized_in_data_representation(self):
         serializer = MyTokenObtainPairSerializer()
-        attrs = {'email': 'robert@gmail.com', 'password': 'Pass*2024*'}
+        attrs = {"email": "robert@gmail.com", "password": "Pass*2024*"}
 
         result = serializer.validate(attrs)
 
-        assert 'user' in result
-        assert 'id' in result['user']
-        assert 'first_name' in result['user']
-        assert 'last_name' in result['user']
-        assert 'email' in result['user']
-        assert 'mobile_phone' in result['user']
-        assert 'role' in result['user']
-        assert 'is_admin_user' in result['user']
+        assert "user" in result
+        assert "id" in result["user"]
+        assert "first_name" in result["user"]
+        assert "last_name" in result["user"]
+        assert "email" in result["user"]
+        assert "mobile_phone" in result["user"]
+        assert "role" in result["user"]
+        assert "is_admin_user" in result["user"]
 
     def test_correct_data_in_serializer_data(self):
         serializer = MyTokenObtainPairSerializer()
-        attrs = {'email': 'robert@gmail.com', 'password': 'Pass*2024*'}
+        attrs = {"email": "robert@gmail.com", "password": "Pass*2024*"}
 
         data = serializer.validate(attrs)
         self.assertEqual(data.get("user").get("first_name"), "Robert")

@@ -7,7 +7,7 @@ User = get_user_model()
 
 
 def clear_user_cache():
-    user_cache = cache.keys('*user*')
+    user_cache = cache.keys("*user*")
     delete_cache = cache.delete_many(user_cache)
 
 

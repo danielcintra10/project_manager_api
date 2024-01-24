@@ -1,4 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -24,6 +27,11 @@ class ListCreateUser(ListCreateAPIView):
         else:
             self.permission_classes = [permissions.IsAdminUser, ]
         return super().get_permissions()
+
+    @method_decorator(cache_page(60 * 30, key_prefix='user'))
+    @method_decorator(vary_on_cookie)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class RetrieveUpdateDestroyUser(RetrieveUpdateDestroyAPIView):
@@ -53,11 +61,21 @@ class ListProjectManagerUsers(ListAPIView):
     queryset = User.objects.filter(is_active=True, deleted=False, is_superuser=False, role="P")
     permission_classes = [permissions.IsAdminUser | IsProjectManager]
 
+    @method_decorator(cache_page(60 * 30, key_prefix='user'))
+    @method_decorator(vary_on_cookie)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class ListDeveloperUsers(ListAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.filter(is_active=True, deleted=False, is_superuser=False, role="D")
     permission_classes = [permissions.IsAdminUser | IsProjectManager]
+
+    @method_decorator(cache_page(60 * 30, key_prefix='user'))
+    @method_decorator(vary_on_cookie)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class MyTokenObtainPairView(TokenObtainPairView):

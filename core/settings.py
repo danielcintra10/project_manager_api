@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "django_celery_results",
     "django_celery_beat",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
 ]
 
 MIDDLEWARE = [
@@ -149,7 +151,8 @@ AUTH_USER_MODEL = "accounts.User"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 # JWT Token Configuration
@@ -218,4 +221,17 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
     }
+}
+
+
+# DRF-SPECTACULAR SETTINGS
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Project Manager API",
+    "DESCRIPTION": "API to help Project Managers with projects & team tasks.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
 }

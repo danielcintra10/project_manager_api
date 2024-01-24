@@ -1,5 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.http import Http404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
 from rest_framework import permissions
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
@@ -30,6 +33,11 @@ class ListCreateProject(ListCreateAPIView):
         if self.request.method == 'POST':
             context['request'] = self.request
         return context
+
+    @method_decorator(cache_page(60 * 30, key_prefix='project'))
+    @method_decorator(vary_on_cookie)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class RetrieveUpdateDestroyProject(RetrieveUpdateDestroyAPIView):
@@ -76,6 +84,11 @@ class ListCreateTask(ListCreateAPIView):
         context['fields'] = True
         return context
 
+    @method_decorator(cache_page(60 * 30, key_prefix='task'))
+    @method_decorator(vary_on_cookie)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class RetrieveUpdateDestroyTask(RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.filter(is_active=True, is_deleted=False)
@@ -116,6 +129,11 @@ class ListProjectsByProjectManager(ListAPIView):
                                           project_manager__id__exact=project_manager_id)
         return queryset
 
+    @method_decorator(cache_page(60 * 30, key_prefix='project'))
+    @method_decorator(vary_on_cookie)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class ListTasksByDeveloper(ListAPIView):
     serializer_class = TaskSerializer
@@ -131,6 +149,11 @@ class ListTasksByDeveloper(ListAPIView):
         context = super().get_serializer_context()
         context['fields'] = True
         return context
+
+    @method_decorator(cache_page(60 * 30, key_prefix='task'))
+    @method_decorator(vary_on_cookie)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class ListDeveloperTasksInProject(ListAPIView):
@@ -152,11 +175,21 @@ class ListDeveloperTasksInProject(ListAPIView):
         context['fields'] = True
         return context
 
+    @method_decorator(cache_page(60 * 30, key_prefix='task'))
+    @method_decorator(vary_on_cookie)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class ListAvailableDevelopers(ListAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.filter(tasks__isnull=True, role__exact='D', is_active=True, deleted=False)
     permission_classes = [permissions.IsAdminUser | IsProjectManager]
+
+    @method_decorator(cache_page(60 * 30, key_prefix='user'))
+    @method_decorator(vary_on_cookie)
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class EnableProject(UpdateAPIView):

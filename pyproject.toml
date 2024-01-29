@@ -1,0 +1,20 @@
+[tool.black]
+line-length = 79
+target-version = ['py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+ | \.hg
+ | \.mypy_cache
+ | \.nox
+ | \.tox
+ | \.env
+ | \.env.template
+ | \.venv/.*
+ | _build
+ | buck-out
+ | build
+ | dist
+)/
+'''
